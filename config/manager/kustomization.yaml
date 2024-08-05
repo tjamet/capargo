@@ -1,0 +1,5 @@
+resources:
+- namespace.yaml
+- manager.yaml
+- serviceaccount.yaml
+- manager-role-binding.yaml
