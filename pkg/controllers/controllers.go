@@ -18,7 +18,30 @@ const (
 	ArgoCDSecretTypeLabelName = "argocd.argoproj.io/secret-type"
 
 	ArgoCDSecretTypeCluster = "cluster"
+
+	ArgoCDCompareAnnotation     = "argocd.argoproj.io/compare-options"
+	ArgoCDSyncOptionsAnnotation = "argocd.argoproj.io/sync-options"
+
+	ArgoCDIgnoreExtraneous = "IgnoreExtraneous"
 )
+
+type ArgoCDCompareOptions []ArgoCDSyncOption
+
+func (o ArgoCDCompareOptions) AnnotationValue() string {
+	var result string
+	for i, option := range o {
+		if i > 0 {
+			result += ","
+		}
+		result += option.Kind + "=" + option.Value
+	}
+	return result
+}
+
+type ArgoCDSyncOption struct {
+	Kind  string
+	Value string
+}
 
 type CapargoMode string
 

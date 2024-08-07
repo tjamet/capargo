@@ -190,6 +190,11 @@ func (r *ClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		}
 		argoCDClusterSecret.Annotations[annotation(r.AnnotationPrefix, ClusterNameAnnotationSuffix)] = cluster.Name
 		argoCDClusterSecret.Annotations[annotation(r.AnnotationPrefix, ClusterNamespaceAnnotationSuffix)] = cluster.Namespace
+		argoCDClusterSecret.Annotations[ArgoCDCompareAnnotation] = ArgoCDIgnoreExtraneous
+		argoCDClusterSecret.Annotations[ArgoCDSyncOptionsAnnotation] = ArgoCDCompareOptions{
+			{Kind: "Prune", Value: "false"},
+			{Kind: "Delete", Value: "false"},
+		}.AnnotationValue()
 
 		config, err := json.Marshal(restConfigToArgoCDConfig(restConfig))
 		if err != nil {
