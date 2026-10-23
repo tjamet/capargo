@@ -115,12 +115,12 @@ func TestClusterReconcilerSkipsNonArgoCDClusterObjects(t *testing.T) {
 }
 
 type queueFunc struct {
-	workqueue.RateLimitingInterface
+	workqueue.TypedRateLimitingInterface[reconcile.Request]
 	AddRateLimitedCount int
-	AddRateLimitedFunc  func(item interface{})
+	AddRateLimitedFunc  func(item reconcile.Request)
 }
 
-func (q *queueFunc) AddRateLimited(item interface{}) {
+func (q *queueFunc) AddRateLimited(item reconcile.Request) {
 	q.AddRateLimitedCount++
 	if q.AddRateLimitedFunc != nil {
 		q.AddRateLimitedFunc(item)

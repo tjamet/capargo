@@ -37,6 +37,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
 type AuthenticationSettings struct {
@@ -303,7 +304,7 @@ type clusterSecretEventHandler struct {
 
 var _ handler.EventHandler = &clusterSecretEventHandler{}
 
-func (c *clusterSecretEventHandler) Create(ctx context.Context, e event.CreateEvent, q workqueue.RateLimitingInterface) {
+func (c *clusterSecretEventHandler) Create(ctx context.Context, e event.CreateEvent, q workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 	klog.FromContext(ctx).V(5).WithName("clusterSecretEventHandler").WithValues("event", e).Info("create event")
 	req := reconcileReqFromSecret(ctx, c.AnnotationPrefix, c.ArgoCDNamespace, e.Object)
 	if req != nil {
@@ -311,7 +312,7 @@ func (c *clusterSecretEventHandler) Create(ctx context.Context, e event.CreateEv
 	}
 }
 
-func (c *clusterSecretEventHandler) Update(ctx context.Context, e event.UpdateEvent, q workqueue.RateLimitingInterface) {
+func (c *clusterSecretEventHandler) Update(ctx context.Context, e event.UpdateEvent, q workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 	klog.FromContext(ctx).V(5).WithName("clusterSecretEventHandler").WithValues("event", e).Info("update event")
 	req := reconcileReqFromSecret(ctx, c.AnnotationPrefix, c.ArgoCDNamespace, e.ObjectNew)
 	if req != nil {
@@ -319,7 +320,7 @@ func (c *clusterSecretEventHandler) Update(ctx context.Context, e event.UpdateEv
 	}
 }
 
-func (c *clusterSecretEventHandler) Delete(ctx context.Context, e event.DeleteEvent, q workqueue.RateLimitingInterface) {
+func (c *clusterSecretEventHandler) Delete(ctx context.Context, e event.DeleteEvent, q workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 	klog.FromContext(ctx).V(5).WithName("clusterSecretEventHandler").WithValues("event", e).Info("delete event")
 	req := reconcileReqFromSecret(ctx, c.AnnotationPrefix, c.ArgoCDNamespace, e.Object)
 	if req != nil {
@@ -327,7 +328,7 @@ func (c *clusterSecretEventHandler) Delete(ctx context.Context, e event.DeleteEv
 	}
 }
 
-func (c *clusterSecretEventHandler) Generic(ctx context.Context, e event.GenericEvent, q workqueue.RateLimitingInterface) {
+func (c *clusterSecretEventHandler) Generic(ctx context.Context, e event.GenericEvent, q workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 	klog.FromContext(ctx).V(5).WithName("clusterSecretEventHandler").WithValues("event", e).Info("generic event")
 }
 
