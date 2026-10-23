@@ -107,7 +107,7 @@ func main() {
 	)
 
 	logOptions := logs.NewOptions()
-	diagnosticsOptions := flags.DiagnosticsOptions{}
+	managerOptions := flags.ManagerOptions{}
 
 	featureGate := featuregate.NewFeatureGate()
 	featureGate.Add(map[featuregate.Feature]featuregate.FeatureSpec{
@@ -123,7 +123,7 @@ func main() {
 	logs.AddFlags(pflag.CommandLine, logs.SkipLoggingConfigurationFlags())
 	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
 	v1.AddFlags(logOptions, pflag.CommandLine)
-	flags.AddDiagnosticsOptions(pflag.CommandLine, &diagnosticsOptions)
+	flags.AddManagerOptions(pflag.CommandLine, &managerOptions)
 	featureGate.AddFlag(pflag.CommandLine)
 
 	pflag.Parse()
@@ -134,14 +134,19 @@ func main() {
 		os.Exit(1)
 	}
 
-	diagnosticsOpts := flags.GetDiagnosticsOptions(diagnosticsOptions)
+	// The TLS options are already part of the returned metrics options.
+	_, diagnosticsOpts, err := flags.GetManagerOptions(managerOptions)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "unable to process manager options: %v\n", err)
+		os.Exit(1)
+	}
 
 	ctrl.SetLogger(klog.Background())
 	ctx := context.Background()
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:                 scheme,
-		Metrics:                diagnosticsOpts,
+		Metrics:                *diagnosticsOpts,
 		LeaderElection:         enableLeaderElection,
 		LeaseDuration:          &leaderElectionLeaseDuration,
 		RenewDeadline:          &leaderElectionRenewDeadline,
