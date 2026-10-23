@@ -2,8 +2,9 @@ name: build images
 
 on:
   workflow_call:
+  # Publishing to ghcr needs a registry credential that is not set up on
+  # Gitea, so branch pushes must not run this workflow.
   push:
-    branches: [ "*", "**/*" ]
     tags: [ "*" ]
 
 jobs:
