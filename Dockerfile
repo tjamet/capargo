@@ -15,7 +15,7 @@
 # limitations under the License.
 
 # Build the manager binary
-ARG builder_image=golang:1.25
+ARG builder_image=golang:1.26
 FROM --platform=$BUILDPLATFORM ${builder_image} as toolchain
 ARG TARGETPLATFORM
 
