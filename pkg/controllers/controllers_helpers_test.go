@@ -11,7 +11,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/clientcmd/api"
-	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
+	clusterv1 "sigs.k8s.io/cluster-api/api/core/v1beta1"
+	clusterv1beta2 "sigs.k8s.io/cluster-api/api/core/v1beta2"
 	"sigs.k8s.io/cluster-api/util/kubeconfig"
 	"sigs.k8s.io/cluster-api/util/secret"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -127,7 +128,8 @@ func (b *capiSecretBuilder) Build(t *testing.T) *v1.Secret {
 		},
 	}
 	if b.cluster != nil {
-		secret = kubeconfig.GenerateSecret(b.cluster, out)
+		// kubeconfig.GenerateSecret takes the v1beta2 Cluster since CAPI 1.11; only its metadata is read.
+		secret = kubeconfig.GenerateSecret(&clusterv1beta2.Cluster{ObjectMeta: b.cluster.ObjectMeta}, out)
 	}
 	secret.Name = secretName
 	return secret
